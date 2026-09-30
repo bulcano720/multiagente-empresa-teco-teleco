@@ -1,2 +1,10 @@
-# multiagente-empresa-teco-teleco
-esto es una prueba multiagente ia de una empre que no solo es de soporte sino también de venta estilo chat hay un agente primordial que analisara susolicitud y recomendara y automáticamente en el chat lo pondrá en contacto con el agente con la solicitud que este realizando xD  
+---
+title: Sistema Multiagente TECO TELCO
+emoji: ⚡
+colorFrom: blue
+colorTo: indigo
+sdk: gradio
+sdk_version: 4.44.0
+app_file: app.py
+pinned: false
+---
