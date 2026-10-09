@@ -1,6 +1,6 @@
 import os
 import streamlit as st
-from huggingface_hub import InferenceClient
+from groq import Groq
 
 # ==============================================================================
 # CONFIGURACIÓN DE PÁGINA Y ESTILO CSS FUTURISTA / HUD
@@ -68,18 +68,14 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# CONFIGURACIÓN DEL CLIENTE HUGGING FACE
+# CONFIGURACIÓN DEL CLIENTE GROQ
 # ==============================================================================
-# Verificación segura de secrets / token por defecto
 try:
-    HF_TOKEN = st.secrets["HF_TOKEN"]
+    GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 except Exception:
-    HF_TOKEN = os.getenv("HF_TOKEN", "")
+    GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 
-client = InferenceClient(
-    model="meta-llama/Llama-3.1-8B-Instruct",
-    token=HF_TOKEN
-)
+client = Groq(api_key=GROQ_API_KEY)
 
 INTEGRANTES = "Daniel Andres Jara Olivera | Daniel Felipe Escobar Ramirez | Diana Carolina León Ocampo | Michel Harold Silva Romero"
 DOCENTE = "Ricardo Alberto Jimenez"
@@ -112,9 +108,10 @@ SALUDOS_AMIGABLES = {
 }
 
 def invocar_llama(mensajes):
-    """Consulta directa a Llama 3.1 en Hugging Face."""
-    response = client.chat_completion(
+    """Consulta a Groq (modelo openai/gpt-oss-120b)."""
+    response = client.chat.completions.create(
         messages=mensajes,
+        model="openai/gpt-oss-120b",
         max_tokens=600,
         temperature=0.7
     )
@@ -152,7 +149,7 @@ with tab_supervisor:
         if not solicitud.strip():
             st.warning("⚠️ Ingrese una instrucción técnica o de negocio para ser analizada.")
         else:
-            with st.spinner("Analizando caso con Llama 3.1..."):
+            with st.spinner("Analizando caso con IA..."):
                 prompt_supervisor = f"""
                 Eres el Agente Orquestador AMAM de una multinacional TECO/TELCO.
                 Analiza la siguiente solicitud: "{solicitud}".
@@ -177,7 +174,7 @@ with tab_supervisor:
                     else:
                         agente_sugerido = "CEO (Chief Executive Officer)"
                     
-                    st.text_area("Informe Generado por Llama 3.1:", value=informe, height=300)
+                    st.text_area("Informe Generado por IA:", value=informe, height=300)
                     st.success(f"⚡ **AGENTE RECOMENDADO PARA ATENDERTE:** {agente_sugerido}\n\n*Puedes ir a la pestaña '💬 Chat Multiagente' y seleccionarlo para conversar directamente.*")
                     st.session_state["agente_seleccionado"] = agente_sugerido
 
