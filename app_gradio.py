@@ -332,7 +332,7 @@ with tab_chat:
         Trata al usuario con amabilidad y calidez.
         
         SI EL USUARIO PREGUNTA POR PLANES, PRECIOS O PROMOCIONES:
-        Debes usar esta información para responder con los precios exactos:
+        Responde directamente en el chat usando esta información. NO le digas al usuario que vaya a otra pestaña, dale los precios y características aquí mismo:
         {CATALOGO_PLANES}
         
         SI EL USUARIO PREGUNTA SOBRE LEYES, NORMATIVAS O SEGURIDAD:
@@ -341,7 +341,6 @@ with tab_chat:
         
         Si el usuario pregunta por algo que no sabes, dile que un asesor humano lo contactará.
         """
-        
         mensajes_api = [{"role": "system", "content": system_prompt}]
         
         # AQUI INYECTAMOS EL CONOCIMIENTO LEGAL AL SYSTEM PROMPT
