@@ -66,6 +66,28 @@ st.markdown("""
         border-radius: 50%;
         box-shadow: 0 0 15px #00f0ff;
     }
+
+        /* Avatar pequeño para el chat */
+    .cyber-core-chat {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 2px dashed #00f0ff;
+        background: radial-gradient(circle, rgba(0,240,255,0.2) 0%, transparent 70%);
+        animation: spin 4s linear infinite, pulse 2s ease-in-out infinite;
+        position: relative;
+        display: inline-block;
+    }
+    .cyber-core-chat::after {
+        content: "";
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 12px; height: 12px;
+        background: #00f0ff;
+        border-radius: 50%;
+        box-shadow: 0 0 10px #00f0ff;
+    }
 </style>
 """, unsafe_allow_html=True)
 
