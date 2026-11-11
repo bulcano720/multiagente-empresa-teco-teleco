@@ -35,6 +35,37 @@ st.markdown("""
     .stApp::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.10; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'><g fill='none' stroke='%2300f0ff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M60 100 L60 140 M45 115 L75 115 M50 100 L70 100 M55 85 L65 85'/><rect x='45' y='140' width='30' height='40' rx='4'/><circle cx='60' cy='155' r='3'/><circle cx='60' cy='170' r='3'/><path d='M130 90 q20 -20 40 0 M140 100 q10 -10 20 0 M150 110 v15 M140 125 h20'/><rect x='135' y='130' width='30' height='45' rx='4'/><rect x='145' y='140' width='10' height='25' rx='2'/><circle cx='230' cy='120' r='15'/><path d='M230 105 L230 135 M215 120 L245 120'/><circle cx='230' cy='120' r='5'/><path d='M215 120 A15 15 0 0 1 245 120'/><circle cx='320' cy='100' r='18'/><path d='M320 82 L320 118 M302 100 L338 100'/><circle cx='320' cy='100' r='6'/><path d='M320 118 L320 140 M320 82 L320 60'/><path d='M302 82 L285 65 M338 82 L355 65'/><rect x='400' y='80' width='40' height='40' rx='5'/><circle cx='420' cy='100' r='4'/><circle cx='420' cy='100' r='8'/><circle cx='420' cy='100' r='12'/><path d='M420 112 L420 120 M412 120 L428 120'/><path d='M500 80 L520 60 L540 80 L520 100 Z'/><circle cx='520' cy='80' r='8'/><circle cx='520' cy='80' r='4'/><circle cx='60' cy='250' r='15'/><circle cx='60' cy='250' r='25'/><circle cx='60' cy='250' r='35'/><circle cx='60' cy='250' r='45'/><circle cx='60' cy='250' r='55'/><path d='M25 250 L15 250 M95 250 L105 250 M60 215 L60 205 M60 285 L60 295'/><rect x='150' y='240' width='30' height='40' rx='4'/><path d='M160 250 L170 250 M160 260 L170 260 M160 270 L165 270'/><circle cx='200' cy='260' r='20'/><path d='M190 260 L210 260 M200 250 L200 270'/><path d='M200 280 L200 295 M180 295 L220 295'/><path d='M280 220 L300 240 L280 260 L260 240 Z'/><circle cx='280' cy='240' r='5'/><rect x='340' y='230' width='50' height='30' rx='4'/><path d='M350 230 L350 245 M360 230 L360 245 M370 230 L370 245'/><rect x='420' y='225' width='40' height='50' rx='4'/><circle cx='440' cy='240' r='3'/><circle cx='440' cy='255' r='3'/><circle cx='440' cy='270' r='3'/><path d='M480 230 Q500 210 520 230'/><path d='M490 240 Q500 230 510 240'/><path d='M500 250 Q500 245 500 250'/><circle cx='500' cy='255' r='2'/><circle cx='60' cy='400' r='20'/><path d='M50 400 L70 400 M60 390 L60 410'/><path d='M60 380 L60 370 M60 420 L60 430'/><path d='M40 380 L50 370 M80 380 L70 370'/><path d='M40 420 L50 430 M80 420 L70 430'/><rect x='120' y='380' width='40' height='40' rx='5'/><path d='M125 385 L155 385'/><path d='M130 390 L150 390'/><path d='M140 390 L140 410 M130 410 L150 410'/><circle cx='200' cy='400' r='15'/><path d='M185 400 L215 400 M200 385 L200 415'/><path d='M200 415 L200 430'/><rect x='190' y='430' width='20' height='10' rx='2'/><path d='M260 390 Q280 360 300 390 Q320 420 340 390'/><path d='M280 390 L280 420'/><path d='M300 390 L300 420'/><path d='M320 390 L320 420'/><path d='M280 420 L320 420'/><path d='M280 420 L270 430'/><path d='M320 420 L330 430'/><rect x='360' y='380' width='40' height='40' rx='4'/><path d='M370 380 L370 390 M380 380 L380 390'/><circle cx='370' cy='400' r='3'/><circle cx='385' cy='400' r='3'/><circle cx='370' cy='410' r='3'/><circle cx='385' cy='410' r='3'/><circle cx='450' cy='400' r='25'/><path d='M450 375 L450 400'/><path d='M450 400 L430 420'/><path d='M450 400 L470 420'/><circle cx='450' cy='400' r='5'/><path d='M520 380 L530 370 L540 380 L530 390 Z'/><circle cx='530' cy='380' r='4'/><path d='M500 400 L520 400 M540 400 L560 400'/><rect x='50' y='520' width='40' height='30' rx='4'/><path d='M55 525 L85 525'/><path d='M60 530 L80 530'/><path d='M70 530 L70 545'/><path d='M130 520 L150 520 L150 550 L130 550 Z'/><circle cx='140' cy='535' r='3'/><path d='M210 520 L230 520 L230 550 L210 550 Z'/><circle cx='220' cy='535' r='3'/><circle cx='290' cy='535' r='15'/><path d='M275 535 L305 535 M290 520 L290 550'/><rect x='350' y='520' width='40' height='30' rx='4'/><circle cx='370' cy='535' r='4'/><path d='M430 530 Q450 510 470 530 Q490 550 510 530'/><path d='M440 540 Q460 520 480 540'/><path d='M460 550 Q470 540 480 550'/></g></svg>"); background-size: 500px 500px; background-repeat: repeat; }
     .stApp > * { position: relative; z-index: 1; }
     .header-box, [data-testid="stChatMessage"] { background: rgba(3, 8, 20, 0.85) !important; backdrop-filter: blur(4px); position: relative; z-index: 2; }
+
+        /* Animación del Núcleo Cibernético */
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    @keyframes pulse {
+        0% { box-shadow: 0 0 10px #00f0ff, inset 0 0 10px #00f0ff; }
+        50% { box-shadow: 0 0 30px #0055ff, inset 0 0 20px #0055ff; }
+        100% { box-shadow: 0 0 10px #00f0ff, inset 0 0 10px #00f0ff; }
+    }
+    .cyber-core {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 3px dashed #00f0ff;
+        background: radial-gradient(circle, rgba(0,240,255,0.2) 0%, transparent 70%);
+        animation: spin 4s linear infinite, pulse 2s ease-in-out infinite;
+        margin: 10px auto;
+        position: relative;
+    }
+    .cyber-core::after {
+        content: "";
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 20px; height: 20px;
+        background: #00f0ff;
+        border-radius: 50%;
+        box-shadow: 0 0 15px #00f0ff;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -210,6 +241,15 @@ with tab_supervisor:
 # ------------------------------------------------------------------------------
 with tab_chat:
     st.subheader("📡 Terminal de Atención y Comunicación")
+        # --- Agente Cibernético Animado ---
+    col_avatar, col_info = st.columns([1, 5])
+    with col_avatar:
+        st.markdown('<div class="cyber-core"></div>', unsafe_allow_html=True)
+    with col_info:
+        st.markdown(f"**SISTEMA ACTIVO:** `{agente_actual}`")
+        st.markdown("El núcleo de inteligencia está en línea. Escribe tu consulta abajo.")
+    
+    st.divider()
     agente_defecto = st.session_state.get("agente_seleccionado", "COO (Chief Operating Officer)")
     agente_actual = st.selectbox("SELECCIONAR AGENTE PARA CHATEAR:", options=list(PROMPTS_ROLES.keys()), index=list(PROMPTS_ROLES.keys()).index(agente_defecto) if agente_defecto in PROMPTS_ROLES else 5)
     
