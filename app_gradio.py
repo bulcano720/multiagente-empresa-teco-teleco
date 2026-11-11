@@ -368,5 +368,25 @@ with tab_admin:
             st.error(f"❌ Error al conectar con Google Sheets. Asegúrate de que la hoja sea pública y que el enlace sea el correcto. Detalle: {e}")
             
         st.divider()
-        st.subheader("📋 Ver Formulario Original")
-        components.iframe(URL_GOOGLE_FORM, height=600, scrolling=True)
+                st.divider()
+        st.subheader("📊 Distribución de Calificaciones")
+        
+        # Creamos el gráfico de barras
+        if not df.empty:
+            # Contamos cuántas veces aparece cada estrella (1, 2, 3, 4, 5)
+            conteo_estrellas = df[c_est].value_counts().sort_index()
+            
+            # Nos aseguramos de que siempre estén las 5 estrellas en el eje X
+            todos_los_valores = [1, 2, 3, 4, 5]
+            conteo_final = {v: conteo_estrellas.get(v, 0) for v in todos_los_valores}
+            
+            # Preparamos los datos para el gráfico nativo de Streamlit
+            chart_data = pd.DataFrame({
+                "Estrellas": ["1 ⭐", "2 ⭐", "3 ⭐", "4 ⭐", "5 ⭐"],
+                "Cantidad": list(conteo_final.values())
+            })
+            
+            # Mostramos el gráfico
+            st.bar_chart(chart_data, x="Estrellas", y="Cantidad", color="#00f0ff")
+        else:
+            st.info("Aún no hay datos suficientes para generar un gráfico.")
