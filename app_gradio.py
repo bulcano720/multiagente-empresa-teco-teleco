@@ -368,7 +368,7 @@ with tab_admin:
             st.error(f"❌ Error al conectar con Google Sheets. Asegúrate de que la hoja sea pública y que el enlace sea el correcto. Detalle: {e}")
             
         st.divider()
-                st.divider()
+        
         st.subheader("📊 Distribución de Calificaciones")
         
         # Creamos el gráfico de barras
