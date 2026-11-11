@@ -140,7 +140,10 @@ client = Groq(api_key=GROQ_API_KEY)
 
 INTEGRANTES = "Daniel Andres Jara Olivera | Daniel Felipe Escobar Ramirez | Diana Carolina León Ocampo | Michel Harold Silva Romero"
 DOCENTE = "Ricardo Alberto Jimenez"
-
+CLAVE_ADMIN = "admin123" # Puedes cambiar esta contraseña
+if "calificaciones" not in st.session_state:
+    st.session_state["calificaciones"] = []
+    
 # ==============================================================================
 # 📜 BASE DE CONOCIMIENTO LEGAL Y COMERCIAL
 # ==============================================================================
@@ -251,6 +254,7 @@ tab_supervisor, tab_chat, tab_planes, tab_calificar = st.tabs([
     "💬 Chat Multiagente", 
     "🏠 Planes Hogar",
     "⭐ Calificar Servicio"
+    "🔐 Admin (Métricas)"
 ])
 
 # ------------------------------------------------------------------------------
@@ -429,16 +433,12 @@ with tab_planes:
 # ------------------------------------------------------------------------------
 with tab_calificar:
     st.subheader("⭐ Califica la atención de nuestro Agente IA")
-    st.write("Tu opinión es fundamental para mejorar el servicio. Por favor, dinos cómo te sentiste.")
+    st.write("Tu opinión es fundamental para mejorar el servicio. **Tus datos son 100% anónimos.**")
     
     with st.form("form_calificacion"):
-        # Selector de estrellas
         estrellas = st.slider("¿Cuántas estrellas le das a la atención?", 1, 5, 5)
-        
-        # Variable para guardar el feedback
         feedback = ""
         
-        # Lógica: Si es 1 o 2 estrellas, es OBLIGATORIO dejar el mensaje
         if estrellas <= 2:
             st.warning("⚠️ Lamentamos que tu experiencia no haya sido buena. Por favor, cuéntanos qué falló para poder mejorar.")
             feedback = st.text_area("¿Cuál fue el motivo de tu calificación?", placeholder="Ej: El agente no respondió a mi pregunta sobre la Ley 1341...")
@@ -449,12 +449,95 @@ with tab_calificar:
         enviar = st.form_submit_button("Enviar Calificación")
         
     if enviar:
-        # Validación
         if estrellas <= 2 and not feedback.strip():
             st.error("❌ Debes escribir el motivo por el cual calificaste con 1 o 2 estrellas.")
         else:
-            # Aquí se podría guardar en base de datos, por ahora lo mostramos con éxito
+            # Generamos un código anónimo aleatorio para proteger la identidad
+            import random
+            id_anonimo = f"USR-{random.randint(1000, 9999)}"
+            
+            # Guardamos en la sesión (en un caso real, esto iría a una base de datos SQL)
+            st.session_state["calificaciones"].append({
+                "id": id_anonimo,
+                "estrellas": estrellas,
+                "comentario": feedback if feedback.strip() else "Sin comentario."
+            })
+            
             st.balloons()
-            st.success(f"✅ ¡Gracias por tu calificación de {estrellas} estrellas! Tu feedback ha sido registrado.")
-            if feedback:
-                st.info(f"**Tu comentario:** {feedback}")
+            st.success(f"✅ ¡Gracias por tu calificación de {estrellas} estrellas, **{id_animo}**! Tu feedback ha sido registrado de forma anónima.")
+# ------------------------------------------------------------------------------
+# PESTAÑA 5: PANEL DE ADMINISTRADOR
+# ------------------------------------------------------------------------------
+with tab_admin:
+    st.subheader("🔐 Panel de Control del Administrador")
+    
+    # Verificamos si ya se autenticó o si es la primera vez
+    if "admin_logged" not in st.session_state:
+        st.session_state["admin_logged"] = False
+        
+    if not st.session_state["admin_logged"]:
+        st.info("Ingresa la contraseña para ver las métricas y calificaciones.")
+        password = st.text_input("Contraseña:", type="password")
+        if st.button("Ingresar"):
+            if password == CLAVE_ADMIN:
+                st.session_state["admin_logged"] = True
+                st.rerun()
+            else:
+                st.error("❌ Contraseña incorrecta. Inténtalo de nuevo.")
+    else:
+        # Código que se muestra si la contraseña es correcta
+        st.success("✅ Acceso concedido. Bienvenido, Administrador.")
+        
+        # Botón para cerrar sesión
+        if st.button("🚪 Cerrar Sesión"):
+            st.session_state["admin_logged"] = False
+            st.rerun()
+            
+        st.divider()
+        
+        califs = st.session_state["calificaciones"]
+        
+        if not califs:
+            st.warning("Aún no hay calificaciones registradas.")
+        else:
+            # --- MÉTRICAS ---
+            total = len(califs)
+            buenas = sum(1 for c in califs if c["estrellas"] >= 4)
+            malas = sum(1 for c in califs if c["estrellas"] <= 2)
+            promedio = sum(c["estrellas"] for c in califs) / total
+            
+            col1, col2, col3, col4 = st.columns(4)
+            col1.metric("📊 Total Calificaciones", total)
+            col2.metric("⭐ Promedio", f"{promedio:.1f} / 5")
+            col3.metric("✅ Buenas (4-5 ⭐)", buenas)
+            col4.metric("❌ Malas (1-2 ⭐)", malas)
+            
+            st.divider()
+            
+            # --- LISTADO DIVIDIDO POR BUENAS Y MALAS ---
+            col_b, col_m = st.columns(2)
+            
+            with col_b:
+                st.subheader("✅ Calificaciones Positivas")
+                for c in reversed(califs):
+                    if c["estrellas"] >= 3:
+                        st.markdown(f"""
+                        <div class="plan-card" style="border-color: #00ff88; text-align: left;">
+                            <b>{c['id']}</b> - {'⭐' * c['estrellas']}<br>
+                            <span style="color: #e0f7ff; font-size: 13px;">"{c['comentario']}"</span>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        
+            with col_m:
+                st.subheader("❌ Calificaciones Negativas")
+                if malas == 0:
+                    st.info("¡Excelente! No hay calificaciones negativas.")
+                else:
+                    for c in reversed(califs):
+                        if c["estrellas"] <= 2:
+                            st.markdown(f"""
+                            <div class="plan-card" style="border-color: #ff4b4b; text-align: left;">
+                                <b>{c['id']}</b> - {'⭐' * c['estrellas']}<br>
+                                <span style="color: #e0f7ff; font-size: 13px;">"{c['comentario']}"</span>
+                            </div>
+                            """, unsafe_allow_html=True)
