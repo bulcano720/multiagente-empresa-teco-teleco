@@ -368,25 +368,31 @@ with tab_admin:
             st.error(f"❌ Error al conectar con Google Sheets. Asegúrate de que la hoja sea pública y que el enlace sea el correcto. Detalle: {e}")
             
         st.divider()
-        
+                
         st.subheader("📊 Distribución de Calificaciones")
         
-        # Creamos el gráfico de barras
         if not df.empty:
             # Contamos cuántas veces aparece cada estrella (1, 2, 3, 4, 5)
             conteo_estrellas = df[c_est].value_counts().sort_index()
             
-            # Nos aseguramos de que siempre estén las 5 estrellas en el eje X
+            # Nos aseguramos de que siempre estén las 5 estrellas
             todos_los_valores = [1, 2, 3, 4, 5]
             conteo_final = {v: conteo_estrellas.get(v, 0) for v in todos_los_valores}
             
-            # Preparamos los datos para el gráfico nativo de Streamlit
+            # Creamos la tabla con los textos derechitos
             chart_data = pd.DataFrame({
-                "Estrellas": ["1 ⭐", "2 ⭐", "3 ⭐", "4 ⭐", "5 ⭐"],
-                "Cantidad": list(conteo_final.values())
+                "Calificación": ["⭐ 1", "⭐ 2", "⭐ 3", "⭐ 4", "⭐ 5"],
+                "Votos": list(conteo_final.values())
             })
             
-            # Mostramos el gráfico
-            st.bar_chart(chart_data, x="Estrellas", y="Cantidad", color="#00f0ff")
+            # Generamos el gráfico con Altair para controlar la rotación del texto
+            import altair as alt
+            chart = alt.Chart(chart_data).mark_bar(color="#00f0ff").encode(
+                x=alt.X('Calificación', sort=None, axis=alt.Axis(labelAngle=0)), # labelAngle=0 los pone horizontales
+                y=alt.Y('Votos', axis=alt.Axis(tickMinStep=1)) # tickMinStep=1 evita decimales en el eje Y
+            ).properties(height=350)
+            
+            st.altair_chart(chart, use_container_width=True)
         else:
             st.info("Aún no hay datos suficientes para generar un gráfico.")
+       
