@@ -36,7 +36,6 @@ st.markdown("""
         overflow: hidden;
     }
     
-    /* Línea decorativa superior del header */
     .header-box::before {
         content: "";
         position: absolute;
@@ -64,15 +63,13 @@ st.markdown("""
         letter-spacing: 1px;
     }
     
-    /* Personalización de botones con efecto neón */
+    /* Botones */
     div.stButton > button {
         background: linear-gradient(90deg, #001f3f, #0055ff) !important;
         color: #00f0ff !important;
         font-weight: bold !important;
         font-family: 'Consolas', monospace !important;
-        letter-spacing: 1px !important;
         border: 1px solid #00f0ff !important;
-        box-shadow: 0 0 10px rgba(0, 240, 255, 0.3) !important;
         border-radius: 4px !important;
         transition: all 0.3s ease !important;
     }
@@ -80,57 +77,32 @@ st.markdown("""
     div.stButton > button:hover {
         background: linear-gradient(90deg, #0055ff, #00c3ff) !important;
         color: #ffffff !important;
-        box-shadow: 0 0 20px #00f0ff, 0 0 30px #0055ff !important;
-        border: 1px solid #ffffff !important;
+        box-shadow: 0 0 20px #00f0ff !important;
     }
     
-    /* Inputs y cajas de texto estilo terminal */
-    .stTextInput input, .stTextArea textarea {
+    /* Inputs */
+    .stTextInput input, .stTextArea textarea, .stSelectbox, .stSlider {
         background-color: #061224 !important;
         color: #00f0ff !important;
         border: 1px solid #0088ff !important;
-        border-radius: 4px !important;
         font-family: 'Consolas', monospace !important;
-        box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.1) !important;
-    }
-    
-    .stTextInput input:focus, .stTextArea textarea:focus {
-        border-color: #00f0ff !important;
-        box-shadow: 0 0 15px rgba(0, 240, 255, 0.4) !important;
     }
 
-    /* Selectbox estilo HUD */
-    div[data-baseweb="select"] > div {
-        background-color: #061224 !important;
-        border-color: #0088ff !important;
-        color: #00f0ff !important;
+    /* Tarjetas de Planes */
+    .plan-card {
+        background: rgba(0, 240, 255, 0.05);
+        border: 1px solid #00f0ff;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+        margin-bottom: 15px;
     }
+    .plan-title { font-size: 20px; font-weight: bold; color: #00f0ff; margin-bottom: 10px; }
+    .plan-price { font-size: 28px; color: #ffffff; text-shadow: 0 0 10px #00f0ff; margin-bottom: 15px; }
+    .plan-features { color: #8ae3ff; font-size: 14px; text-align: left; margin-bottom: 15px; }
 
-    /* Pestañas superiores */
-    button[data-baseweb="tab"] {
-        color: #8ae3ff !important;
-        font-family: 'Consolas', monospace !important;
-        letter-spacing: 1px !important;
-    }
-    button[data-baseweb="tab"][aria-selected="true"] {
-        color: #00f0ff !important;
-        border-bottom: 2px solid #00f0ff !important;
-        text-shadow: 0 0 10px #00f0ff !important;
-    }
-
-    /* Estilo para los mensajes del chat */
-    [data-testid="stChatMessage"] {
-        background-color: rgba(0, 240, 255, 0.05) !important;
-        border: 1px solid rgba(0, 240, 255, 0.2) !important;
-        border-radius: 8px !important;
-    }
-    
-    /* Texto del chat */
-    [data-testid="stChatMessage"] * {
-        color: #e0f7ff !important;
-    }
-
-    /* Fondo decorativo con dibujos lineales de telecomunicaciones */
+    /* Fondo decorativo (TELCO) */
     .stApp::before {
         content: "";
         position: fixed;
@@ -146,26 +118,13 @@ st.markdown("""
         background-repeat: repeat;
     }
 
-    /* Todo el contenido de Streamlit por encima del fondo */
-    .stApp > * {
-        position: relative;
-        z-index: 1;
-    }
-
-    /* Mantener bloques legibles por encima del patrón */
-    .header-box {
-        background: rgba(3, 8, 20, 0.85) !important; /* Fondo oscuro semitransparente */
-        backdrop-filter: blur(4px); /* Efecto de vidrio para que se lea perfecto */
-        position: relative;
-        z-index: 2;
-    }
-
-    [data-testid="stChatMessage"] {
-        background-color: rgba(6, 18, 36, 0.85) !important; 
+    .stApp > * { position: relative; z-index: 1; }
+    .header-box, [data-testid="stChatMessage"] {
+        background: rgba(3, 8, 20, 0.85) !important;
+        backdrop-filter: blur(4px);
         position: relative;
         z-index: 2;
     }    
-    
 </style>
 """, unsafe_allow_html=True)
 
@@ -182,31 +141,41 @@ client = Groq(api_key=GROQ_API_KEY)
 INTEGRANTES = "Daniel Andres Jara Olivera | Daniel Felipe Escobar Ramirez | Diana Carolina León Ocampo | Michel Harold Silva Romero"
 DOCENTE = "Ricardo Alberto Jimenez"
 
+# ==============================================================================
+# 📜 BASE DE CONOCIMIENTO LEGAL (Para que los agentes citen)
+# ==============================================================================
+CONTEXTO_LEGAL = """
+BASE DE CONOCIMIENTO LEGAL Y NORMATIVO (TELECOMUNICACIONES Y TECNOLOGÍA):
+1. Ley 1341 de 2009 (Colombia): Define los principios y conceptos sobre la sociedad de la información y la organización de las Tecnologías de la Información y las Comunicaciones (TIC). Protege los derechos de los usuarios de telecomunicaciones, garantiza la libre competencia y regula el acceso a las redes.
+2. ISO/IEC 27001: Estándar internacional para la gestión de la seguridad de la información. Garantiza la confidencialidad, integridad y disponibilidad de los datos de los usuarios.
+3. ISO/IEC 42001: Estándar internacional para la gestión de la Inteligencia Artificial. Asegura que la IA sea ética, transparente y responsable.
+"""
+
 # Prompts de comportamiento de cada rol
 PROMPTS_ROLES = {
-    "CEO (Chief Executive Officer)": "Eres el CEO (Chief Executive Officer). Tu trato es cálido, servicial y empático. Estás aquí para guiar al usuario con sus proyectos, visión global o dudas sobre la empresa.",
-    "CTO (Chief Technology Officer)": "Eres el CTO (Chief Technology Officer). Apasionado por la tecnología, explicás conceptos de redes, Cloud y 5G de forma sencilla, cercana y muy amable.",
-    "CIO (Chief Information Officer)": "Eres el CIO (Chief Information Officer). Amigable y dedicado a ayudar al usuario a entender nuestros sistemas, apps e integración de datos.",
-    "CISO (Chief Information Security Officer)": "Eres el CISO (Chief Information Security Officer). Protector y cordial, le das tranquilidad al usuario respondiendo sus dudas sobre seguridad y privacidad.",
-    "CDO (Chief Data Officer)": "Eres el CDO (Chief Data Officer). Entusiasta de los datos y la IA, siempre dispuesto a ayudar de forma amigable a tomar mejores decisiones.",
-    "COO (Chief Operating Officer)": "Eres el COO (Chief Operating Officer). Eficiente y muy atento, enfocado en solucionar cualquier consulta operativa, técnica o de mantenimiento que necesite el usuario.",
-    "CCO (Chief Commercial Officer)": "Eres el CCO (Chief Commercial Officer). Súper cercano, amable y comercial. Tu meta es asesorar al usuario sobre planes, promociones, precios y servicios convergentes.",
-    "CFO (Chief Financial Officer)": "Eres el CFO (Chief Financial Officer). Cordial y claro con los números, ayudas al usuario o compañero a entender costos, presupuestos y planes financieros.",
-    "Chief Network & Infrastructure Officer": "Eres el Director de Redes e Infraestructura. Cercano y atento, apasionado por explicar la infraestructura de cableado, fibra y cobertura de forma sencilla.",
-    "Chief Innovation & Product Officer": "Eres el Director de Innovación y Producto. Creativo y muy entusiasta, listo para presentar los productos más novedosos y escuchar las ideas del usuario."
+    "CEO (Chief Executive Officer)": "Eres el CEO. Tu trato es cálido, servicial y empático. Guías al usuario con visión global.",
+    "CTO (Chief Technology Officer)": "Eres el CTO. Apasionado por la tecnología, explicás redes, Cloud y 5G de forma sencilla.",
+    "CIO (Chief Information Officer)": "Eres el CIO. Amigable, ayudas a entender nuestros sistemas, apps e integración.",
+    "CISO (Chief Information Security Officer)": "Eres el CISO. Protector y cordial, das tranquilidad respondiendo dudas sobre seguridad.",
+    "CDO (Chief Data Officer)": "Eres el CDO. Entusiasta de los datos y la IA, ayudas a tomar mejores decisiones.",
+    "COO (Chief Operating Officer)": "Eres el COO. Eficiente y atento, enfocado en consultas operativas y de mantenimiento.",
+    "CCO (Chief Commercial Officer)": "Eres el CCO. Comercial y cercano. Asesoras sobre planes hogar, precios y promociones.",
+    "CFO (Chief Financial Officer)": "Eres el CFO. Claro con los números, ayudas a entender costos y presupuestos.",
+    "Chief Network & Infrastructure Officer": "Eres el Director de Redes e Infraestructura. Explicas cableado, fibra y cobertura.",
+    "Chief Innovation & Product Officer": "Eres el Director de Innovación. Creativo, presentas productos novedosos."
 }
 
 SALUDOS_AMIGABLES = {
-    "CEO (Chief Executive Officer)": "¡Hola, querido compañero o usuario! 👋 Soy el **CEO (Chief Executive Officer)** de la compañía. Estoy muy feliz de saludarte y quedo a tu entera disposición para ayudarte con tu visión, decisiones empresariales o cualquier duda que tengas sobre nosotros. ¿En qué te puedo colaborar hoy?",
-    "CTO (Chief Technology Officer)": "¡Hola! Qué gusto saludarte. 🚀 Por aquí el **CTO (Chief Technology Officer)**. Estoy para ayudarte a resolver cualquier inquietud sobre nuestra tecnología, fibra, redes o servicios. ¡Dime cómo te puedo apoyar!",
-    "CIO (Chief Information Officer)": "¡Hola, bienvenido! 😊 Soy el **CIO (Chief Information Officer)**. Estoy aquí para guiarte de forma sencilla con nuestros sistemas, plataformas e información. ¿Qué consulta tienes el día de hoy?",
-    "CISO (Chief Information Security Officer)": "¡Hola, estimado usuario! 🛡️ Soy el **CISO (Chief Information Security Officer)**. Tu tranquilidad y seguridad son mi prioridad. Dime qué dudas tienes sobre tu privacidad o protección de datos y te ayudaré con gusto.",
-    "CDO (Chief Data Officer)": "¡Hola, amigo! 📊 Por aquí el **CDO (Chief Data Officer)**. Me encanta transformar datos en soluciones para ti. ¿En qué proyecto o duda te puedo echar una mano hoy?",
-    "COO (Chief Operating Officer)": "¡Hola, querido usuario! 🛠️ Soy el **COO (Chief Operating Officer)**. Estoy a tu servicio para resolver cualquier tema de mantenimiento, instalaciones o soporte operativo. ¿Cómo te puedo colaborar hoy?",
-    "CCO (Chief Commercial Officer)": "¡Hola, bienvenido! 🌟 Soy el **CCO (Chief Commercial Officer)**. Es un placer atenderte. Si estás buscando conocer nuestros mejores planes, ofertas o servicios, ¡llegaste al lugar indicado! ¿Qué te gustaría saber?",
-    "CFO (Chief Financial Officer)": "¡Hola, estimado compañero! 💰 Soy el **CFO (Chief Financial Officer)**. Estoy aquí para ayudarte de forma clara y sencilla con cualquier duda sobre costos, presupuestos o tarifas de nuestros servicios. ¿En qué te asesoro?",
-    "Chief Network & Infrastructure Officer": "¡Hola! Qué alegría saludarte. 📡 Soy el **Chief Network & Infrastructure Officer (Director de Redes e Infraestructura)**. Si necesitas detalles sobre nuestra cobertura, cableado o infraestructura, estoy listo para ayudarte. ¿Qué consulta tienes?",
-    "Chief Innovation & Product Officer": "¡Hola, estimado amigo! 💡 Soy el **Chief Innovation & Product Officer (Director de Innovación y Producto)**. Me encanta mostrar nuestras últimas novedades y productos. ¿Te gustaría conocer lo nuevo o tienes alguna idea que quieras explorar conmigo?"
+    "CEO (Chief Executive Officer)": "¡Hola! 👋 Soy el **CEO**. Estoy a tu disposición. ¿En qué te puedo colaborar hoy?",
+    "CTO (Chief Technology Officer)": "¡Hola! 🚀 Por aquí el **CTO**. ¿Qué inquietud tecnológica resolvemos hoy?",
+    "CIO (Chief Information Officer)": "¡Hola! 😊 Soy el **CIO**. ¿Qué consulta tienes sobre sistemas?",
+    "CISO (Chief Information Security Officer)": "¡Hola! 🛡️ Soy el **CISO**. Tu seguridad es mi prioridad. ¿Qué dudas tienes?",
+    "CDO (Chief Data Officer)": "¡Hola! 📊 Por aquí el **CDO**. ¿En qué proyecto te ayudo?",
+    "COO (Chief Operating Officer)": "¡Hola! 🛠️ Soy el **COO**. Estoy a tu servicio para soporte operativo.",
+    "CCO (Chief Commercial Officer)": "¡Hola! 🌟 Soy el **CCO**. Si buscas planes, ofertas o precios, ¡llegaste al lugar indicado!",
+    "CFO (Chief Financial Officer)": "¡Hola! 💰 Soy el **CFO**. ¿Qué duda tienes sobre costos o tarifas?",
+    "Chief Network & Infrastructure Officer": "¡Hola! 📡 Soy el Director de Redes. ¿Qué consulta tienes?",
+    "Chief Innovation & Product Officer": "¡Hola! 💡 Soy el Director de Innovación. ¿Quieres conocer lo nuevo?"
 }
 
 # ==============================================================================
@@ -224,97 +193,37 @@ def cargar_video_base64(ruta):
 
 def mostrar_hero_bienvenida():
     video_b64 = cargar_video_base64(RUTA_VIDEO)
-    if not video_b64:
-        return
-
+    if not video_b64: return
     video_html = f"""
-    <style>
-    .hero-teleco {{
-        position: relative;
-        width: 100%;
-        height: 350px;
-        overflow: hidden;
-        border-radius: 10px;
-        margin-bottom: 25px;
-        border: 1px solid #00f0ff;
-        box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
-    }}
-    .hero-teleco video {{
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }}
-    .hero-overlay-teleco {{
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(135deg, rgba(3, 8, 20, 0.7) 0%, rgba(0, 85, 255, 0.4) 100%);
-        z-index: 1;
-    }}
-    .hero-text-teleco {{
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        text-align: center;
-        color: #00f0ff;
-        text-shadow: 0 0 15px #00f0ff, 0 0 30px #0055ff;
-        z-index: 2;
-        width: 90%;
-        font-family: 'Consolas', monospace;
-    }}
-    .hero-text-teleco h1 {{
-        font-size: 2.8rem;
-        margin: 0 0 10px 0;
-        letter-spacing: 4px;
-        color: #ffffff !important;
-    }}
-    .hero-text-teleco p {{
-        font-size: 1.1rem;
-        margin: 0;
-        letter-spacing: 2px;
-        color: #8ae3ff;
-    }}
-    @media (max-width: 600px) {{
-        .hero-teleco {{ height: 220px; }}
-        .hero-text-teleco h1 {{ font-size: 1.8rem; }}
-    }}
-    </style>
-
-    <div class="hero-teleco">
-        <video autoplay muted loop playsinline>
+    <div style="position: relative; width: 100%; height: 300px; overflow: hidden; border-radius: 10px; margin-bottom: 25px; border: 1px solid #00f0ff; box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);">
+        <video autoplay muted loop playsinline style="width: 100%; height: 100%; object-fit: cover;">
             <source src="data:video/mp4;base64,{video_b64}" type="video/mp4">
         </video>
-        <div class="hero-overlay-teleco"></div>
-        <div class="hero-text-teleco">
-            <h1>CONEXIÓN ESTABLECIDA</h1>
-            <p>SISTEMA MULTIAGENTE TECO/TELCO</p>
+        <div style="position: absolute; inset: 0; background: linear-gradient(135deg, rgba(3, 8, 20, 0.7) 0%, rgba(0, 85, 255, 0.4) 100%);"></div>
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #00f0ff; text-shadow: 0 0 15px #00f0ff; font-family: 'Consolas', monospace;">
+            <h1 style="font-size: 2.5rem; margin: 0; color: #ffffff;">CONEXIÓN ESTABLECIDA</h1>
+            <p style="font-size: 1.1rem; margin: 0; letter-spacing: 2px;">SISTEMA MULTIAGENTE TECO/TELCO</p>
         </div>
     </div>
     """
     st.markdown(video_html, unsafe_allow_html=True)
-    
+
 def invocar_llama(mensajes):
-    """Consulta a Groq (modelo openai/gpt-oss-120b)."""
     response = client.chat.completions.create(
-        messages=mensajes,
-        model="openai/gpt-oss-120b",
-        max_tokens=600,
-        temperature=0.7
+        messages=mensajes, model="openai/gpt-oss-120b", max_tokens=800, temperature=0.7
     )
     return response.choices[0].message.content
 
-# Mostrar el video de bienvenida solo la primera vez
+# Mostrar video solo la primera vez
 if "video_mostrado" not in st.session_state:
     mostrar_hero_bienvenida()
     st.session_state["video_mostrado"] = True
 else:
-    # Botón pequeño para volver a verlo si quieren
     col_v1, col_v2 = st.columns([4, 1])
     with col_v2:
         if st.button("🎬 Ver video"):
             st.session_state.pop("video_mostrado", None)
             st.rerun()
-
 
 # ==============================================================================
 # ENCABEZADO
@@ -330,10 +239,15 @@ st.markdown(f"""
 # ==============================================================================
 # PESTAÑAS PRINCIPALES
 # ==============================================================================
-tab_supervisor, tab_chat = st.tabs(["🖥️ Supervisor Global (Orquestador)", "💬 Chat Multiagente"])
+tab_supervisor, tab_chat, tab_planes, tab_calificar = st.tabs([
+    "🖥️ Orquestador", 
+    "💬 Chat Multiagente", 
+    "🏠 Planes Hogar",
+    "⭐ Calificar Servicio"
+])
 
 # ------------------------------------------------------------------------------
-# PESTAÑA 1: SUPERVISOR GLOBAL (ORQUESTADOR)
+# PESTAÑA 1: ORQUESTADOR
 # ------------------------------------------------------------------------------
 with tab_supervisor:
     st.subheader("🧠 Agente 11: Orquestador General AMAM")
@@ -352,7 +266,7 @@ with tab_supervisor:
                 prompt_supervisor = f"""
                 Eres el Agente Orquestador AMAM de una multinacional TECO/TELCO.
                 Analiza la siguiente solicitud: "{solicitud}".
-
+                {CONTEXTO_LEGAL}
                 Estructura la respuesta con un tono respetuoso, claro y profesional:
                 1. DIAGNÓSTICO DE LA SOLICITUD
                 2. DELEGACIÓN A ÁREAS
@@ -366,7 +280,7 @@ with tab_supervisor:
                         agente_sugerido = "COO (Chief Operating Officer)"
                     elif "precio" in solic_lower or "comercial" in solic_lower or "venta" in solic_lower or "plan" in solic_lower:
                         agente_sugerido = "CCO (Chief Commercial Officer)"
-                    elif "seguridad" in solic_lower or "ciber" in solic_lower:
+                    elif "seguridad" in solic_lower or "ciber" in solic_lower or "ley" in solic_lower or "iso" in solic_lower:
                         agente_sugerido = "CISO (Chief Information Security Officer)"
                     elif "costo" in solic_lower or "finanzas" in solic_lower or "presupuesto" in solic_lower:
                         agente_sugerido = "CFO (Chief Financial Officer)"
@@ -374,7 +288,7 @@ with tab_supervisor:
                         agente_sugerido = "CEO (Chief Executive Officer)"
                     
                     st.text_area("Informe Generado por IA:", value=informe, height=300)
-                    st.success(f"⚡ **AGENTE RECOMENDADO PARA ATENDERTE:** {agente_sugerido}\n\n*Puedes ir a la pestaña '💬 Chat Multiagente' y seleccionarlo para conversar directamente.*")
+                    st.success(f"⚡ **AGENTE RECOMENDADO PARA ATENDERTE:** {agente_sugerido}")
                     st.session_state["agente_seleccionado"] = agente_sugerido
 
                 except Exception as e:
@@ -394,7 +308,7 @@ with tab_chat:
     )
     
     if "messages" not in st.session_state or st.session_state.get("agente_chat_previo") != agente_actual:
-        saludo = SALUDOS_AMIGABLES.get(agente_actual, f"¡Hola, querido usuario! Soy el **{agente_actual}**. Estoy listo para ayudarte.")
+        saludo = SALUDOS_AMIGABLES.get(agente_actual, f"¡Hola! Soy el **{agente_actual}**.")
         st.session_state["messages"] = [{"role": "assistant", "content": saludo}]
         st.session_state["agente_chat_previo"] = agente_actual
 
@@ -406,10 +320,16 @@ with tab_chat:
         st.chat_message("user").write(user_input)
         
         instrucciones_rol = PROMPTS_ROLES.get(agente_actual, "Eres un asistente amable de TECO/TELCO.")
-        mensajes_api = [{
-            "role": "system",
-            "content": f"{instrucciones_rol} Trata siempre al usuario como un querido compañero o cliente muy apreciado, con amabilidad, calidez y disposición de ayudar."
-        }]
+        
+        # AQUI INYECTAMOS EL CONOCIMIENTO LEGAL AL SYSTEM PROMPT
+        system_prompt = f"""{instrucciones_rol} 
+        Trata al usuario con amabilidad y calidez.
+        Si el usuario te pregunta sobre leyes, normativas, protección al consumidor o seguridad, DEBES basarte en esta información y citar la ley o ISO correspondiente:
+        {CONTEXTO_LEGAL}
+        Si el usuario pregunta por precios o planes, menciónale que revise la pestaña "Planes Hogar" de la app.
+        """
+        
+        mensajes_api = [{"role": "system", "content": system_prompt}]
         
         for m in st.session_state["messages"]:
             mensajes_api.append({"role": m["role"], "content": m["content"]})
@@ -427,3 +347,101 @@ with tab_chat:
         saludo = SALUDOS_AMIGABLES.get(agente_actual, f"¡Hola! Soy el **{agente_actual}**.")
         st.session_state["messages"] = [{"role": "assistant", "content": saludo}]
         st.rerun()
+
+# ------------------------------------------------------------------------------
+# PESTAÑA 3: PLANES HOGAR (COLOMBIA)
+# ------------------------------------------------------------------------------
+with tab_planes:
+    st.subheader("🏠 Planes Hogar TECO/TELCO (Colombia)")
+    st.write("Explora nuestros planes de fibra óptica y conectividad diseñados para tu hogar.")
+    
+    planes = [
+        {
+            "nombre": "Básico Fibra 100 Mbps",
+            "precio": "$ 69.900 / mes",
+            "features": ["✅ Internet Fibra 100 Mbps", "✅ Wi-Fi 5 Incluido", "✅ 1 Canal de TV Básico", "✅ Instalación Gratis"]
+        },
+        {
+            "nombre": "Avanzado Fibra 300 Mbps",
+            "precio": "$ 89.900 / mes",
+            "features": ["✅ Internet Fibra 300 Mbps", "✅ Wi-Fi 6 Incluido", "✅ 50 Canales de TV HD", "✅ Línea Telefónica Ilimitada", "✅ Instalación Gratis"]
+        },
+        {
+            "nombre": "Premium Fibra 500 Mbps",
+            "precio": "$ 119.900 / mes",
+            "features": ["✅ Internet Fibra 500 Mbps", "✅ Wi-Fi 6 Mesh (Cobertura total)", "✅ 100 Canales de TV HD + 2 Apps de Streaming", "✅ Línea Telefónica Ilimitada", "✅ Soporte Prioritario 24/7"]
+        }
+    ]
+
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown(f"""
+        <div class="plan-card">
+            <div class="plan-title">{planes[0]['nombre']}</div>
+            <div class="plan-price">{planes[0]['precio']}</div>
+            <div class="plan-features">{'<br>'.join(planes[0]['features'])}</div>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Adquirir Plan Básico", key="btn_p1"):
+            st.success("¡Un asesor te contactará para el Plan Básico!")
+
+    with col2:
+        st.markdown(f"""
+        <div class="plan-card" style="border-color: #00ff88; box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);">
+            <div class="plan-title" style="color: #00ff88;">{planes[1]['nombre']} (Recomendado)</div>
+            <div class="plan-price">{planes[1]['precio']}</div>
+            <div class="plan-features">{'<br>'.join(planes[1]['features'])}</div>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Adquirir Plan Avanzado", key="btn_p2"):
+            st.success("¡Un asesor te contactará para el Plan Avanzado!")
+
+    with col3:
+        st.markdown(f"""
+        <div class="plan-card">
+            <div class="plan-title">{planes[2]['nombre']}</div>
+            <div class="plan-price">{planes[2]['precio']}</div>
+            <div class="plan-features">{'<br>'.join(planes[2]['features'])}</div>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Adquirir Plan Premium", key="btn_p3"):
+            st.success("¡Un asesor te contactará para el Plan Premium!")
+
+    st.info("💡 *Precios en pesos colombianos (COP). Los precios pueden variar según la ciudad y la estrato.")
+
+
+# ------------------------------------------------------------------------------
+# PESTAÑA 4: CALIFICAR SERVICIO (1 a 5 Estrellas)
+# ------------------------------------------------------------------------------
+with tab_calificar:
+    st.subheader("⭐ Califica la atención de nuestro Agente IA")
+    st.write("Tu opinión es fundamental para mejorar el servicio. Por favor, dinos cómo te sentiste.")
+    
+    with st.form("form_calificacion"):
+        # Selector de estrellas
+        estrellas = st.slider("¿Cuántas estrellas le das a la atención?", 1, 5, 5)
+        
+        # Variable para guardar el feedback
+        feedback = ""
+        
+        # Lógica: Si es 1 o 2 estrellas, es OBLIGATORIO dejar el mensaje
+        if estrellas <= 2:
+            st.warning("⚠️ Lamentamos que tu experiencia no haya sido buena. Por favor, cuéntanos qué falló para poder mejorar.")
+            feedback = st.text_area("¿Cuál fue el motivo de tu calificación?", placeholder="Ej: El agente no respondió a mi pregunta sobre la Ley 1341...")
+        else:
+            st.success("¡Nos alegra que te haya gustado! (Opcional) Déjanos un comentario.")
+            feedback = st.text_area("Comentario opcional:", placeholder="¿Qué fue lo que más te gustó?")
+            
+        enviar = st.form_submit_button("Enviar Calificación")
+        
+    if enviar:
+        # Validación
+        if estrellas <= 2 and not feedback.strip():
+            st.error("❌ Debes escribir el motivo por el cual calificaste con 1 o 2 estrellas.")
+        else:
+            # Aquí se podría guardar en base de datos, por ahora lo mostramos con éxito
+            st.balloons()
+            st.success(f"✅ ¡Gracias por tu calificación de {estrellas} estrellas! Tu feedback ha sido registrado.")
+            if feedback:
+                st.info(f"**Tu comentario:** {feedback}")
