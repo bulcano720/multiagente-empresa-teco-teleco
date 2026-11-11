@@ -267,7 +267,7 @@ with tab_chat:
     agente_defecto = st.session_state.get("agente_seleccionado", "COO (Chief Operating Officer)")
     agente_actual = st.selectbox("SELECCIONAR AGENTE PARA CHATEAR:", options=list(PROMPTS_ROLES.keys()), index=list(PROMPTS_ROLES.keys()).index(agente_defecto) if agente_defecto in PROMPTS_ROLES else 5)
 
-      # --- Agente Cibernético Animado ---
+    # --- Agente Cibernético Animado (Grande en la cabecera) ---
     col_avatar, col_info = st.columns([1, 5])
     with col_avatar:
         st.markdown('<div class="cyber-core"></div>', unsafe_allow_html=True)
@@ -277,18 +277,32 @@ with tab_chat:
     
     st.divider()
     
+    # Inicializar historial si cambia de agente
     if "messages" not in st.session_state or st.session_state.get("agente_chat_previo") != agente_actual:
         saludo = SALUDOS_AMIGABLES.get(agente_actual, f"¡Hola! Soy el **{agente_actual}**.")
         st.session_state["messages"] = [{"role": "assistant", "content": saludo}]
         st.session_state["agente_chat_previo"] = agente_actual
 
+    # 1. Mostrar el historial del chat (Con el reactor animado para el bot)
     for msg in st.session_state["messages"]:
-        st.chat_message(msg["role"]).write(msg["content"])
+        if msg["role"] == "assistant":
+            with st.chat_message("assistant", avatar=None):
+                col_icono, col_texto = st.columns([1, 15])
+                with col_icono:
+                    st.markdown('<div class="cyber-core-chat"></div>', unsafe_allow_html=True)
+                with col_texto:
+                    st.markdown(msg["content"])
+        else:
+            with st.chat_message(msg["role"]):
+                st.write(msg["content"])
 
+    # 2. Capturar el mensaje del usuario
     if user_input := st.chat_input("Escribe tu mensaje o pregunta aquí..."):
         st.session_state["messages"].append({"role": "user", "content": user_input})
-        st.chat_message("user").write(user_input)
-        
+        with st.chat_message("user"):
+            st.write(user_input)
+            
+        # 3. Preparar los prompts e invocar a la IA
         instrucciones_rol = PROMPTS_ROLES.get(agente_actual, "Eres un asistente amable de TECO/TELCO.")
         system_prompt = f"""{instrucciones_rol} 
         Trata al usuario con amabilidad y calidez.
@@ -300,20 +314,24 @@ with tab_chat:
         for m in st.session_state["messages"]:
             mensajes_api.append({"role": m["role"], "content": m["content"]})
             
-        with st.chat_message("assistant"):
-            with st.spinner("Pensando respuesta..."):
-                try:
-                    respuesta = invocar_llama(mensajes_api)
-                    st.write(respuesta)
-                    st.session_state["messages"].append({"role": "assistant", "content": respuesta})
-                except Exception as e:
-                    st.error(f"❌ Error en respuesta del agente: {str(e)}")
+        # 4. El bot responde mostrando el reactor animado
+        with st.chat_message("assistant", avatar=None):
+            col_icono2, col_texto2 = st.columns([1, 15])
+            with col_icono2:
+                st.markdown('<div class="cyber-core-chat"></div>', unsafe_allow_html=True)
+            with col_texto2:
+                with st.spinner("El núcleo está procesando..."):
+                    try:
+                        respuesta = invocar_llama(mensajes_api)
+                        st.markdown(respuesta) # Usamos markdown para que las tablas de los planes se vean bien
+                        st.session_state["messages"].append({"role": "assistant", "content": respuesta})
+                    except Exception as e:
+                        st.error(f"❌ Error en respuesta del agente: {str(e)}")
 
     if st.button("🗑️ Limpiar Historial", key="btn_limpiar_chat"):
         saludo = SALUDOS_AMIGABLES.get(agente_actual, f"¡Hola! Soy el **{agente_actual}**.")
         st.session_state["messages"] = [{"role": "assistant", "content": saludo}]
         st.rerun()
-
 # ------------------------------------------------------------------------------
 # PESTAÑA 3: PLANES HOGAR
 # ------------------------------------------------------------------------------
