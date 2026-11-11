@@ -272,30 +272,42 @@ with tab_planes:
         if st.button("Adquirir Plan Premium", key="btn_p3"): st.success("¡Un asesor te contactará!")
 
 # ------------------------------------------------------------------------------
-# PESTAÑA 4: CALIFICAR SERVICIO (Se envía a Google Forms)
+# PESTAÑA 4: CALIFICAR SERVICIO (Redirección directa a Google Forms)
 # ------------------------------------------------------------------------------
 with tab_calificar:
     st.subheader("⭐ Califica la atención de nuestro Agente IA")
-    st.write("Tu opinión es fundamental. **Tus datos son 100% anónimos.** Al enviar, se abrirá un formulario seguro de Google.")
+    st.write("Tu opinión es fundamental para mejorar el servicio. **Tus datos son 100% anónimos.**")
     
-    with st.form("form_calificacion"):
-        estrellas = st.slider("¿Cuántas estrellas le das a la atención?", 1, 5, 5)
-        feedback = ""
-        if estrellas <= 2:
-            st.warning("⚠️ Lamentamos que no haya sido buena. Cuéntanos qué falló.")
-            feedback = st.text_area("¿Cuál fue el motivo?", placeholder="Ej: No respondió sobre la Ley 1341...")
-        else:
-            st.success("¡Nos alegra que te haya gustado! (Opcional) Déjanos un comentario.")
-            feedback = st.text_area("Comentario opcional:", placeholder="¿Qué te gustó más?")
-            
-        enviar = st.form_submit_button("Enviar Calificación a Google Forms")
-        
-    if enviar:
-        if estrellas <= 2 and not feedback.strip():
-            st.error("❌ Debes escribir el motivo por el cual calificaste con 1 o 2 estrellas.")
-        else:
-            st.warning("⚠️ Por seguridad de Google, haz clic en el botón **'Enviar'** dentro del formulario que aparece a continuación:")
-            components.iframe(URL_GOOGLE_FORM, height=500, scrolling=True)
+    st.info("Para garantizar la seguridad y transparencia de tus datos, la calificación se realiza directamente en nuestra plataforma segura de Google.")
+    
+    # Inyectamos un botón HTML personalizado con el diseño HUD que abre el Forms en una pestaña nueva
+    st.markdown(f"""
+    <div style="text-align: center; margin-top: 40px; margin-bottom: 40px;">
+        <a href="{URL_GOOGLE_FORM.replace('?embedded=true', '')}" target="_blank" style="
+            background: linear-gradient(90deg, #001f3f, #0055ff);
+            color: #00f0ff;
+            text-decoration: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            font-family: 'Consolas', monospace;
+            border: 1px solid #00f0ff;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+            transition: all 0.3s ease;
+            display: inline-block;
+        " onmouseover="this.style.boxShadow='0 0 25px #00f0ff'; this.style.color='#ffffff';" 
+           onmouseout="this.style.boxShadow='0 0 15px rgba(0, 240, 255, 0.4)'; this.style.color='#00f0ff';">
+            🚀 ABRIR FORMULARIO DE CALIFICACIÓN
+        </a>
+        <p style="color: #8ae3ff; font-size: 12px; margin-top: 15px;">Se abrirá en una pestaña nueva</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.divider()
+    st.subheader("📋 Vista previa del Formulario")
+    st.caption("Puedes ver el formulario aquí abajo (si no carga, usa el botón de arriba).")
+    components.iframe(URL_GOOGLE_FORM, height=500, scrolling=True)
 
 # ------------------------------------------------------------------------------
 # PESTAÑA 5: PANEL DE ADMINISTRADOR (Lee de Google Sheets)
