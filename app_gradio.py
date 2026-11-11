@@ -142,7 +142,7 @@ INTEGRANTES = "Daniel Andres Jara Olivera | Daniel Felipe Escobar Ramirez | Dian
 DOCENTE = "Ricardo Alberto Jimenez"
 
 # ==============================================================================
-# 📜 BASE DE CONOCIMIENTO LEGAL (Para que los agentes citen)
+# 📜 BASE DE CONOCIMIENTO LEGAL Y COMERCIAL
 # ==============================================================================
 CONTEXTO_LEGAL = """
 BASE DE CONOCIMIENTO LEGAL Y NORMATIVO (TELECOMUNICACIONES Y TECNOLOGÍA):
@@ -150,6 +150,7 @@ BASE DE CONOCIMIENTO LEGAL Y NORMATIVO (TELECOMUNICACIONES Y TECNOLOGÍA):
 2. ISO/IEC 27001: Estándar internacional para la gestión de la seguridad de la información. Garantiza la confidencialidad, integridad y disponibilidad de los datos de los usuarios.
 3. ISO/IEC 42001: Estándar internacional para la gestión de la Inteligencia Artificial. Asegura que la IA sea ética, transparente y responsable.
 """
+
 CATALOGO_PLANES = """
 CATÁLOGO DE PLANES HOGAR (Precios en Colombia - COP):
 1. Plan Básico Fibra 100 Mbps: Precio $69.900/mes. Incluye: Internet Fibra 100 Mbps, Wi-Fi 5, 1 Canal de TV Básico, Instalación Gratis.
@@ -165,7 +166,7 @@ PROMPTS_ROLES = {
     "CISO (Chief Information Security Officer)": "Eres el CISO. Protector y cordial, das tranquilidad respondiendo dudas sobre seguridad.",
     "CDO (Chief Data Officer)": "Eres el CDO. Entusiasta de los datos y la IA, ayudas a tomar mejores decisiones.",
     "COO (Chief Operating Officer)": "Eres el COO. Eficiente y atento, enfocado en consultas operativas y de mantenimiento.",
-    "CCO (Chief Commercial Officer)": "Eres el CCO (Chief Commercial Officer). Súper cercano, amable y comercial. Tu meta principal es asesorar al usuario sobre nuestros planes hogar, promociones, precios y servicios convergentes usando el catálogo disponible.",
+    "CCO (Chief Commercial Officer)": "Eres el CCO (Chief Commercial Officer). Súper cercano, amable y comercial. Tu meta principal es asesorar al usuario sobre nuestros planes hogar, promociones, precios y servicios convergentes.",
     "CFO (Chief Financial Officer)": "Eres el CFO. Claro con los números, ayudas a entender costos y presupuestos.",
     "Chief Network & Infrastructure Officer": "Eres el Director de Redes e Infraestructura. Explicas cableado, fibra y cobertura.",
     "Chief Innovation & Product Officer": "Eres el Director de Innovación. Creativo, presentas productos novedosos."
@@ -327,7 +328,7 @@ with tab_chat:
         
         instrucciones_rol = PROMPTS_ROLES.get(agente_actual, "Eres un asistente amable de TECO/TELCO.")
 
-        # INYECTAMOS EL CONOCIMIENTO LEGAL Y EL CATÁLOGO DE PLANES
+        # INYECTAMOS EL CONOCIMIENTO LEGAL Y EL CATÁLOGO DE PLANES (ÚNICA VERSIÓN)
         system_prompt = f"""{instrucciones_rol} 
         Trata al usuario con amabilidad y calidez.
         
@@ -341,16 +342,6 @@ with tab_chat:
         
         Si el usuario pregunta por algo que no sabes, dile que un asesor humano lo contactará.
         """
-        mensajes_api = [{"role": "system", "content": system_prompt}]
-        
-        # AQUI INYECTAMOS EL CONOCIMIENTO LEGAL AL SYSTEM PROMPT
-        system_prompt = f"""{instrucciones_rol} 
-        Trata al usuario con amabilidad y calidez.
-        Si el usuario te pregunta sobre leyes, normativas, protección al consumidor o seguridad, DEBES basarte en esta información y citar la ley o ISO correspondiente:
-        {CONTEXTO_LEGAL}
-        Si el usuario pregunta por precios o planes, menciónale que revise la pestaña "Planes Hogar" de la app.
-        """
-        
         mensajes_api = [{"role": "system", "content": system_prompt}]
         
         for m in st.session_state["messages"]:
