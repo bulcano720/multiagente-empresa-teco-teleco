@@ -105,7 +105,8 @@ except Exception:
 
 client = Groq(api_key=GROQ_API_KEY)
 
-INTEGRANTES = "Daniel Andres Jara Olivera | Daniel Felipe Escobar Ramirez | Diana Carolina León Ocampo | Michel Harold Silva Romero"
+# INTEGRANTES = "Daniel Andres Jara Olivera | Daniel Felipe Escobar Ramirez | Diana Carolina León Ocampo | Michel Harold Silva Romero"
+INTEGRANTES = "andres stiven ite |  luis eduardo segura  |andres orjuela  | daniel felipe escobar"
 DOCENTE = "Ricardo Alberto Jimenez"
 CLAVE_ADMIN = "admin123"
 
