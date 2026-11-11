@@ -140,10 +140,9 @@ client = Groq(api_key=GROQ_API_KEY)
 
 INTEGRANTES = "Daniel Andres Jara Olivera | Daniel Felipe Escobar Ramirez | Diana Carolina León Ocampo | Michel Harold Silva Romero"
 DOCENTE = "Ricardo Alberto Jimenez"
-CLAVE_ADMIN = "admin123" # Puedes cambiar esta contraseña
+CLAVE_ADMIN = "admin123"
 if "calificaciones" not in st.session_state:
     st.session_state["calificaciones"] = []
-    
 # ==============================================================================
 # 📜 BASE DE CONOCIMIENTO LEGAL Y COMERCIAL
 # ==============================================================================
@@ -249,11 +248,11 @@ st.markdown(f"""
 # ==============================================================================
 # PESTAÑAS PRINCIPALES
 # ==============================================================================
-tab_supervisor, tab_chat, tab_planes, tab_calificar = st.tabs([
+tab_supervisor, tab_chat, tab_planes, tab_calificar, tab_admin = st.tabs([
     "🖥️ Orquestador", 
     "💬 Chat Multiagente", 
     "🏠 Planes Hogar",
-    "⭐ Calificar Servicio"
+    "⭐ Calificar Servicio",
     "🔐 Admin (Métricas)"
 ])
 
@@ -464,7 +463,7 @@ with tab_calificar:
             })
             
             st.balloons()
-            st.success(f"✅ ¡Gracias por tu calificación de {estrellas} estrellas, **{id_animo}**! Tu feedback ha sido registrado de forma anónima.")
+           st.success(f"✅ ¡Gracias por tu calificación de {estrellas} estrellas, **{id_anonimo}**! Tu feedback ha sido registrado de forma anónima.")
 # ------------------------------------------------------------------------------
 # PESTAÑA 5: PANEL DE ADMINISTRADOR
 # ------------------------------------------------------------------------------
