@@ -21,6 +21,10 @@ st.set_page_config(
 # ==============================================================================
 st.markdown("""
 <style>
+    /* Ocultar el ícono por defecto de Streamlit en el chat */
+    [data-testid="stChatMessageAvatarAssistant"] {
+        display: none !important;
+    }
     .stApp { background-color: #030814; color: #00f0ff; font-family: 'Consolas', monospace; }
     .header-box { background: linear-gradient(135deg, rgba(0, 240, 255, 0.05) 0%, rgba(0, 100, 255, 0.15) 100%); border: 1px solid #00f0ff; box-shadow: 0 0 20px rgba(0, 240, 255, 0.4); padding: 25px; border-radius: 10px; margin-bottom: 25px; position: relative; overflow: hidden; }
     .header-title { color: #00f0ff; text-shadow: 0 0 12px #00f0ff; font-weight: bold; font-size: 26px; letter-spacing: 3px; margin-bottom: 15px; }
