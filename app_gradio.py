@@ -241,7 +241,11 @@ with tab_supervisor:
 # ------------------------------------------------------------------------------
 with tab_chat:
     st.subheader("📡 Terminal de Atención y Comunicación")
-        # --- Agente Cibernético Animado ---
+      
+    agente_defecto = st.session_state.get("agente_seleccionado", "COO (Chief Operating Officer)")
+    agente_actual = st.selectbox("SELECCIONAR AGENTE PARA CHATEAR:", options=list(PROMPTS_ROLES.keys()), index=list(PROMPTS_ROLES.keys()).index(agente_defecto) if agente_defecto in PROMPTS_ROLES else 5)
+
+      # --- Agente Cibernético Animado ---
     col_avatar, col_info = st.columns([1, 5])
     with col_avatar:
         st.markdown('<div class="cyber-core"></div>', unsafe_allow_html=True)
@@ -250,8 +254,6 @@ with tab_chat:
         st.markdown("El núcleo de inteligencia está en línea. Escribe tu consulta abajo.")
     
     st.divider()
-    agente_defecto = st.session_state.get("agente_seleccionado", "COO (Chief Operating Officer)")
-    agente_actual = st.selectbox("SELECCIONAR AGENTE PARA CHATEAR:", options=list(PROMPTS_ROLES.keys()), index=list(PROMPTS_ROLES.keys()).index(agente_defecto) if agente_defecto in PROMPTS_ROLES else 5)
     
     if "messages" not in st.session_state or st.session_state.get("agente_chat_previo") != agente_actual:
         saludo = SALUDOS_AMIGABLES.get(agente_actual, f"¡Hola! Soy el **{agente_actual}**.")
