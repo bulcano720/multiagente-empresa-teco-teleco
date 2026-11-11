@@ -1,11 +1,11 @@
 import os
 import base64
 import random
+import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
 from groq import Groq
 from streamlit_gsheets import GSheetsConnection
-import pandas as pd
 
 # ==============================================================================
 # CONFIGURACIÓN DE PÁGINA
@@ -55,9 +55,7 @@ CLAVE_ADMIN = "admin123"
 # ==============================================================================
 # 🎬 CONFIGURACIÓN DE GOOGLE FORMS / SHEETS
 # ==============================================================================
-# ⚠️ REEMPLAZA ESTOS ENLACES CON LOS TUYOS
 URL_GOOGLE_FORM = "https://docs.google.com/forms/d/e/1FAIpQLSfyFw3UO8oq-pugW8Dd-HbTyxO6iHLLmbl3I2qdUd7xYffQMw/viewform?embedded=true"
-# El enlace de tu Google Sheet para leer los datos (debe ser público)
 URL_GOOGLE_SHEET = "https://docs.google.com/spreadsheets/d/1p9MCrTWz232x3au62gh6sm4-7I7NsVaR1px5-8BKmLk/edit?usp=sharing"
 
 # ==============================================================================
@@ -296,8 +294,6 @@ with tab_calificar:
         if estrellas <= 2 and not feedback.strip():
             st.error("❌ Debes escribir el motivo por el cual calificaste con 1 o 2 estrellas.")
         else:
-            # Inyectamos el Google Form de forma invisible para que el navegador del usuario lo procese
-            # (Google Forms requiere que el usuario haga clic en "Enviar" dentro del iframe)
             st.warning("⚠️ Por seguridad de Google, haz clic en el botón **'Enviar'** dentro del formulario que aparece a continuación:")
             components.iframe(URL_GOOGLE_FORM, height=500, scrolling=True)
 
@@ -329,48 +325,61 @@ with tab_admin:
         # --- LEER DATOS DE GOOGLE SHEETS ---
         try:
             conn = st.connection("gsheets", type=GSheetsConnection)
-            df = conn.read(spreadsheet=URL_GOOGLE_SHEET, ttl=0) # ttl=0 para que no use caché
+            df = conn.read(spreadsheet=URL_GOOGLE_SHEET, ttl=0) 
+            
+            # Filtramos filas vacías por si acaso
+            df = df.dropna(how="all")
             
             if df.empty:
                 st.warning("Aún no hay calificaciones registradas en Google Sheets.")
             else:
-                # Intentamos detectar las columnas automáticamente
-                # La primera columna suele ser la marca de tiempo, la segunda la calificación (1-5)
-                col_estrellas = df.columns[1] if len(df.columns) > 1 else df.columns[0]
-                col_comentario = df.columns[2] if len(df.columns) > 2 else None
+                # Buscamos dinámicamente las columnas por nombre para evitar errores
+                col_estrellas = [c for c in df.columns if "estrella" in str(c).lower() or "calificaci" in str(c).lower()]
+                col_comentario = [c for c in df.columns if "coment" in str(c).lower()]
                 
-                total = len(df)
-                promedio = df[col_estrellas].mean() if total > 0 else 0
-                buenas = len(df[df[col_estrellas] >= 4])
-                malas = len(df[df[col_estrellas] <= 2])
-                
-                col1, col2, col3, col4 = st.columns(4)
-                col1.metric("📊 Total Calificaciones", total)
-                col2.metric("⭐ Promedio", f"{promedio:.1f} / 5")
-                col3.metric("✅ Buenas (4-5 ⭐)", buenas)
-                col4.metric("❌ Malas (1-2 ⭐)", malas)
-                
-                st.divider()
-                col_b, col_m = st.columns(2)
-                
-                with col_b:
-                    st.subheader("✅ Calificaciones Positivas")
-                    for index, row in df[df[col_estrellas] >= 3].iterrows():
-                        est = int(row[col_estrellas])
-                        com = row[col_comentario] if col_comentario and pd.notna(row[col_comentario]) else "Sin comentario"
-                        st.markdown(f"""<div class="plan-card" style="border-color: #00ff88; text-align: left;"><b>Anónimo</b> - {'⭐' * est}<br><span style="color: #e0f7ff; font-size: 13px;">"{com}"</span></div>""", unsafe_allow_html=True)
-                        
-                with col_m:
-                    st.subheader("❌ Calificaciones Negativas")
-                    if malas == 0: st.info("¡Excelente! No hay calificaciones negativas.")
-                    else:
-                        for index, row in df[df[col_estrellas] <= 2].iterrows():
-                            est = int(row[col_estrellas])
-                            com = row[col_comentario] if col_comentario and pd.notna(row[col_comentario]) else "Sin comentario"
-                            st.markdown(f"""<div class="plan-card" style="border-color: #ff4b4b; text-align: left;"><b>Anónimo</b> - {'⭐' * est}<br><span style="color: #e0f7ff; font-size: 13px;">"{com}"</span></div>""", unsafe_allow_html=True)
+                if not col_estrellas:
+                    st.error("No se encontró la columna de calificación. Asegúrate de haber nombrado la pregunta 'Estrellas' o 'Calificación' en tu formulario.")
+                else:
+                    c_est = col_estrellas[0]
+                    c_com = col_comentario[0] if col_comentario else None
+                    
+                    # Convertimos a número para poder operar
+                    df[c_est] = pd.to_numeric(df[c_est], errors='coerce')
+                    df = df.dropna(subset=[c_est])
+                    
+                    total = len(df)
+                    promedio = df[c_est].mean() if total > 0 else 0
+                    buenas = len(df[df[c_est] >= 4])
+                    malas = len(df[df[c_est] <= 2])
+                    
+                    col1, col2, col3, col4 = st.columns(4)
+                    col1.metric("📊 Total Calificaciones", total)
+                    col2.metric("⭐ Promedio", f"{promedio:.1f} / 5")
+                    col3.metric("✅ Buenas (4-5 ⭐)", buenas)
+                    col4.metric("❌ Malas (1-2 ⭐)", malas)
+                    
+                    st.divider()
+                    col_b, col_m = st.columns(2)
+                    
+                    with col_b:
+                        st.subheader("✅ Calificaciones Positivas")
+                        for index, row in df[df[c_est] >= 3].iterrows():
+                            est = int(row[c_est])
+                            com = row[c_com] if c_com and pd.notna(row[c_com]) else "Sin comentario"
+                            st.markdown(f"""<div class="plan-card" style="border-color: #00ff88; text-align: left;"><b>Anónimo</b> - {'⭐' * est}<br><span style="color: #e0f7ff; font-size: 13px;">"{com}"</span></div>""", unsafe_allow_html=True)
                             
+                    with col_m:
+                        st.subheader("❌ Calificaciones Negativas")
+                        if malas == 0: 
+                            st.info("¡Excelente! No hay calificaciones negativas.")
+                        else:
+                            for index, row in df[df[c_est] <= 2].iterrows():
+                                est = int(row[c_est])
+                                com = row[c_com] if c_com and pd.notna(row[c_com]) else "Sin comentario"
+                                st.markdown(f"""<div class="plan-card" style="border-color: #ff4b4b; text-align: left;"><b>Anónimo</b> - {'⭐' * est}<br><span style="color: #e0f7ff; font-size: 13px;">"{com}"</span></div>""", unsafe_allow_html=True)
+                                
         except Exception as e:
-            st.error(f"❌ Error al conectar con Google Sheets. Asegúrate de haber configurado bien los enlaces y los permisos. Detalle: {e}")
+            st.error(f"❌ Error al conectar con Google Sheets. Asegúrate de que la hoja sea pública y que el enlace sea el correcto. Detalle: {e}")
             
         st.divider()
         st.subheader("📋 Ver Formulario Original")
